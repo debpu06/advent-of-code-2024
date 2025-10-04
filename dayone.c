@@ -5,34 +5,53 @@
 #include <string.h>
 
 const char *FILENAME = "input.txt";
-int countLines() {
+const size_t MAX_INPUT = 1000;
+
+/*
+* @brief Counts the number of lines in the input file.
+* @return The number of lines in the file.
+*/
+size_t countLines() {
 	FILE *cptr = fopen(FILENAME, "r");	
+	assert(cptr != NULL);
+
 	int MAX_BUFFER_LENGTH = 100;
 	char buffer[MAX_BUFFER_LENGTH];
-	int count = 0;
-	while(fgets(buffer, sizeof(buffer), cptr) != NULL) {
+	size_t count = 0;
+	while((fgets(buffer, sizeof(buffer), cptr) != NULL) 
+		&& (count <= MAX_INPUT)) {
 		count++;
 	}
 
 	return count;
 }
 
+/*
+* @brief Extracts numbers from two columns in the input file and stores them in the provided arrays.
+* @param icolumn1 Pointer to the array to store numbers from the first column.
+* @param icolumn2 Pointer to the array to store numbers from the second column.
+* @param lineCount The number of lines to read from the file.
+*/
 void extractNumbers(int *icolumn1, 
 					int *icolumn2, 
-					int lineCount) {
+					size_t lineCount) {
+
+	assert(lineCount <= MAX_INPUT && lineCount > 0);
+	assert(icolumn1 != NULL);
+	assert(icolumn2 != NULL);
+
 	const char *delimiter = "   ";
 	FILE *fptr;
 
 	int MAX_BUFFER_LENGTH = 100;
 
 	fptr = fopen("input.txt", "r");
-	if(fptr == NULL) {
-		printf("Error opening file\n");
-		return;
-	}
+	assert(fptr != NULL);
+
 	char buffer[MAX_BUFFER_LENGTH];
-	int currentLine = 0;
-	while(fgets(buffer, sizeof(buffer), fptr) != NULL) {
+	size_t currentLine = 0;
+	while ((fgets(buffer, sizeof(buffer), fptr) != NULL) 
+		&& (currentLine <= MAX_INPUT)) {
 		char *token1 = strtok(buffer, delimiter);
 		char *token2 = strtok(NULL, delimiter);
 
@@ -40,42 +59,42 @@ void extractNumbers(int *icolumn1,
 		icolumn2[currentLine] = atoi(token2);	
 		currentLine++;
 	}
-	quicksort(icolumn1, 0, lineCount - 1);
-	quicksort(icolumn2, 0, lineCount - 1);
+	quicksort(icolumn1, (int)0, (int)lineCount - 1);
+	quicksort(icolumn2, (int)0, (int)lineCount - 1);
 }
 
 int main() {
 	
-	int lineCount = countLines();
-	
+	size_t lineCount = countLines();
+		
 	int line1[lineCount];
 	int line2[lineCount];
-
+	assert(lineCount <= MAX_INPUT);
 	extractNumbers(line1, line2, lineCount);
 	int sum = 0;
-	for(int i = 0; i < lineCount; i++) {
+	for(size_t i = 0; i < lineCount; i++) {
 		sum += abs(line1[i] - line2[i]);
 	}
-	printf("Sum: %d\n", sum);
+	(void)printf("Sum: %d\n", sum);
 
-	int max = line2[lineCount - 1];	
+	size_t max = line2[lineCount - 1];	
 	int hashmap[max+1];
 
-	for(int i = 0; i < max+1; i++) {
+	for(size_t i = 0; i < max+1; i++) {
 		hashmap[i] = 0;
 	}
-	for(int i = 0; i < lineCount; i++) {
+	for(size_t i = 0; (i < lineCount) && (i < MAX_INPUT); i++) {
 		hashmap[line2[i]] += 1; 
 	}
 	int occuranceTotal = 0;
-	for(int i = 0; i < lineCount; i++) {
-		int current = line1[i];
+	for(size_t i = 0; (i < lineCount) && (i < MAX_INPUT); i++) {
+		size_t current = line1[i];
 		if(current <= max && hashmap[current] > 0) {
-			printf("Occurances: %d\n", hashmap[current]);
 			occuranceTotal += (hashmap[current] * current);
 		}
 	}
-	printf("Occurance Total: %d\n", occuranceTotal);
+	(void)printf("Occurance Total: %d\n", occuranceTotal);
+
 	return 0;
 }
 

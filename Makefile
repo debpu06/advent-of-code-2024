@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -Iutility
+CFLAGS = -std=c2x -Wall -Wextra -Iutility -Werror -Wpedantic
 SRCS = main.c dayone.c utility/sort.c
 OBJS = $(SRCS:.c=.o)
 TARGETS = main dayone
